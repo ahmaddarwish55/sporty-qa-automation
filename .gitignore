@@ -1,0 +1,29 @@
+# Prerequisites
+*.d
+
+# Compiled Python modules
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+pytest.xml
+
+# Environments
+venv/
+env/
+ENV/
+
+# IDE / OS specific files
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Selenium / Logs
+*.log
+geckodriver.log
