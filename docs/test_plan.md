@@ -5,9 +5,9 @@
 ---
 
 ### TC-001 | Happy Path: Successful Single Bet Placement
-*   **Priority:** Critical
-*   **Risk Rationale:** This validates the core transactional engine of the application. If a user cannot successfully place a valid bet and have their balance properly deducted, the business suffers an immediate total failure in revenue generation.
-*   **Steps:**
+* **Priority:** Critical
+* **Risk Rationale:** This validates the core transactional engine of the application. If a user cannot successfully place a valid bet and have their balance properly deducted, the business suffers an immediate total failure in revenue generation.
+* **Steps:**
     1. Navigate to the application URL with a valid user-id = `candidate-PR1EPAagsI`.
     2. Note the current available balance displayed in the header.
     3. From the Match List, select an outcome (e.g., Draw / 'X') for an upcoming match.
@@ -15,13 +15,19 @@
     5. Verify the "Total Stake" and "Potential Payout" calculations update correctly on the slip.
     6. Click the "Place Bet" button.
     7. Observe the button transition to the "Placing..." loading state.
-    8. Upon the appearance of the Success Receipt modal, verify all displayed data (Match, Stake, Odds, Payout).
+    8. Upon the appearance of the Success Receipt modal, verify the presence and accuracy of all required data elements per Section 2.4 (Bet ID, Match details, Selection, Stake, Odds, Payout, Timestamp).
     9. Click the primary "Close" action on the modal.
-*   **Expected Result:**
-    *   The Success Receipt modal displays the correct, un-altered match details, stake, odds, and mathematically correct potential payout (Stake * Odds).
-    *   Closing the receipt returns the user to the main flow, clearing the active selection in the bet slip.
-    *   The user's available balance (in both the header and bet slip) is immediately deducted by the exact stake amount.
-
+* **Expected Result:**
+    * The Success Receipt modal successfully appears and explicitly displays all required elements:
+        * **Bet ID**
+        * **Match details** (preserving the correct Home vs. Away order)
+        * **Selection** (the chosen outcome, e.g., Draw)
+        * **Stake**
+        * **Odds at placement**
+        * **Potential payout** (mathematically correct: Stake * Odds)
+        * **Placement timestamp**
+    * Closing the receipt returns the user to the main flow, clearing the active selection in the bet slip.
+    * The user's available balance (in both the header and bet slip) is immediately deducted by the exact stake amount.
 ---
 
 ### TC-002 | Boundary Value: Minimum and Maximum Stake Limits

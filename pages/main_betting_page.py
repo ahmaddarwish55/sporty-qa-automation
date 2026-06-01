@@ -18,10 +18,12 @@ class MainBettingPage(BasePage):
     SLIP_ODDS = (By.CLASS_NAME, "betSelectionOdds")
     
     # Success Modal
+    MODAL_BET_ID = (By.ID, "modal-success-bet-id")
     MODAL_MATCH = (By.ID, "modal-success-match")
     MODAL_STAKE = (By.ID, "modal-success-stake")
     MODAL_ODDS = (By.ID, "modal-success-odds")
     MODAL_PAYOUT = (By.ID, "modal-success-payout")
+    MODAL_TIMESTAMP = (By.ID, "modal-success-placed-at")
     MODAL_CLOSE_BTN = (By.ID, "modal-success-close")
 
     # Error Modal
@@ -69,10 +71,12 @@ class MainBettingPage(BasePage):
     def get_receipt_details(self):
         """Extracts the data from the Success Modal."""
         return {
+            "bet_id": self.get_text(self.MODAL_BET_ID),
             "match": self.get_text(self.MODAL_MATCH),
             "stake": self.get_text(self.MODAL_STAKE),
             "odds": self.get_text(self.MODAL_ODDS),
-            "payout": self.get_text(self.MODAL_PAYOUT)
+            "payout": self.get_text(self.MODAL_PAYOUT),
+            "timestamp": self.get_text(self.MODAL_TIMESTAMP)
         }
         
     def close_receipt(self):

@@ -15,29 +15,35 @@ def test_successful_bet_placement(driver, test_data, app_config):
     full_url = f"{app_config['base_url']}/?user-id={app_config['user_id']}"
     page.navigate(full_url)
     
+    # pause to allow the page to load and display the initial balance, in loading phase the balance is 0, so we need to wait for it to update
     page.pause()
+
+    #get user balance and extract the number from the text, for example "Balance: €100.00" -> 100.00
     initial_balance_text = page.get_current_balance()
     initial_balance = page.extract_number(initial_balance_text)
     print(f"Initial Balance: €{initial_balance}")
     
+    #get test data for the match and selection from the test_data.json file, this match will be used to place a bet
     print("\nStep 2: Selecting match dynamically from test_data.json...")
     match_data = test_data["matches"]["upcoming_valid_match"]
     page.select_match_outcome(match_id=match_data["id"], selection=test_data["selections"]["draw"])
     
     print("Step 3: Entering stake...")
-    stake_amount = 10.0
+    stake_amount = 1.0
     page.enter_stake(stake_amount)
     
-    # HARD ASSERT 1: UI failure. If the input field fails, we cannot proceed.
+    # HARD ASSERT 1: UI failure. If the input field fails, user cannot proceed.
     totals = page.get_bet_slip_totals()
     ui_stake = page.extract_number(totals["stake"])
+    # If the stake amount in the UI doesn't match what we entered, it's a critical blocker because the user won't be able to place the bet correctly. test fails immediately.
     assert ui_stake == stake_amount, f"CRITICAL BLOCKER: UI Input Failure! Expected €{stake_amount}, got €{ui_stake}"
     
-    # Soft Assertion: Bet Slip Payout Math
+    # Soft Assertion: Bet Slip Payout calculation.
     ui_slip_payout = page.extract_number(totals["payout"])
     slip_odds = page.get_bet_slip_odds()
     expected_slip_payout = round(stake_amount * slip_odds, 2)
 
+    # If the payout calculation is wrong, it's a UI defect but doesn't block the transaction, so we log it as a soft assertion failure.
     if ui_slip_payout != expected_slip_payout:
         ui_defects.append(f"(Bet Slip Math): Slip payout showed €{ui_slip_payout}, expected €{expected_slip_payout}")
 
@@ -58,7 +64,16 @@ def test_successful_bet_placement(driver, test_data, app_config):
     print("\nStep 5: Validating the Success Receipt Data (Soft Assertions)...")
     receipt = page.get_receipt_details()
     
-    # Soft Assertion 1: Payout Math 
+    # Soft Assertion 1: Verify Required Elements Exist & Are Populated 
+    # The requirement specifically asks for the Selection, but the UI completely omits it. 
+    # 'Selection' is required by Section 2.4 but is entirely missing from the UI.
+    if not receipt["bet_id"]:
+        ui_defects.append("(Missing Data): Bet ID is blank or missing from the receipt.")
+    
+    if not receipt["timestamp"]:
+        ui_defects.append("(Missing Data): Placement timestamp is blank or missing.")
+        
+    # Soft Assertion 2: Payout Math 
     ui_odds = float(receipt["odds"])
     actual_ui_payout = page.extract_number(receipt["payout"])
     expected_payout = round(stake_amount * ui_odds, 2)
@@ -66,7 +81,7 @@ def test_successful_bet_placement(driver, test_data, app_config):
     if actual_ui_payout != expected_payout:
         ui_defects.append(f"(Data Binding): Payout UI showed {actual_ui_payout}, expected {expected_payout}")
 
-    # Soft Assertion 2: Team Order 
+    # Soft Assertion 3: Team Order 
     expected_match_name = f"{match_data['home_team']} vs {match_data['away_team']}"
     if receipt["match"] != expected_match_name:
         ui_defects.append(f"(Team Order): Receipt showed '{receipt['match']}', expected '{expected_match_name}'")
@@ -85,10 +100,10 @@ def test_successful_bet_placement(driver, test_data, app_config):
 
     # Final Evaluation: 
     if len(ui_defects) > 0:
-        # We format the list of defects into a readable string
+        # format the list of defects into a readable string
         defect_message = "The bet was placed successfully, but the following UI defects were detected:\n- " + "\n- ".join(ui_defects)
         
-        # We trigger a Pytest Warning instead of an AssertionError
+        # trigger a Pytest Warning instead of an AssertionError
         warnings.warn(UserWarning(defect_message))
         
         print("\n" + defect_message)
