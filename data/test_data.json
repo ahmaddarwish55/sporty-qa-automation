@@ -1,0 +1,12 @@
+{
+    "matches": {
+        "upcoming_valid_match": {
+            "id": "premier-league-arsenal-man-city-2026-11-02",
+            "home_team": "Arsenal",
+            "away_team": "Man City"
+        }
+    },
+    "selections": {
+        "draw": "DRAW"
+    }
+}
