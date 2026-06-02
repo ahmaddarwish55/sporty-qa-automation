@@ -45,7 +45,7 @@ To run this framework locally, ensure you have the following installed:
 
 1. **Clone the repository and navigate to the project root:**
 ```bash
-   git clone <your-repository-url>
+   gh repo clone ahmaddarwish55/sporty-qa-automation
    cd SPORTY-QA-AUTOMATION
    ```
 
